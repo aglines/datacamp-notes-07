@@ -10,6 +10,9 @@ df.info()
     shows all cols, non-null count of rows, and datatype
 df.shape
     number rows and number cos
+
+
+
 df.describe()
     gives some summary stats - count, mean, stddev, min, max..
 df.values
@@ -18,6 +21,8 @@ df.columns
     column names
 df.index 
     shows row numbers or names
+GET NUMBER OF ROWS
+df.shape[0]
 
 ----------------------------------------------------------
 Sorting and subsetting
@@ -76,7 +81,7 @@ add new columns from existing
 df["sizeMeters"] = df["sizeCm"] / 100
 
 ---------------------------------------------------------------
-#### CHAP 2 SUMMARY STATS
+SUMMARY STATS
 
 df["height"].mean()
 min, max
@@ -103,7 +108,10 @@ ditto - cummax(), cummin(), cumprod()
 they all return a df, not a number
 
 --------------------------------------------------------------
-counting
+COUNTING
+
+NUMBER OF ROWS
+len(dframe)
 
 drop duplicates inside a single column
 df.drop_duplicates(subset="colName")
@@ -111,7 +119,8 @@ df.drop_duplicates(subset="colName")
 drop duplicate pairs/groups within multiple columns
 df.drop_duplicates(subset=["col1", "col2"])
 
-count appearances in a column, ie categorical variables
+COUNT APPEARANCES OF A VALUE IN A COLUMN ie categorical variables
+X = df["col1"].value_counts()
 uniques.df["col1"].value_counts()
 
 and sort them as counting

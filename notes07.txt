@@ -52,7 +52,7 @@ np.quantile(dframe['col'], [0, 0.25, 0.5, 0.75, 1])
     50% quantile IS the median, ie half the values are lower than this value
     BOX PLOTS use quartiles, four-divided
 
-QUANTILES w NP.LINSPACE
+LINSPACE with Quantiles
     np.linspace(start, stop, num)
         start number, stop number, number of intervals
 np.quantile(dframe['colName'], np.linspace(0,1,5) )
@@ -70,8 +70,32 @@ can calc by hand yay!
 
 .DESCRIBE method gfives us ltos of these incl quartiles
 
+#######################################################
+CH 2 CHANCES
+
+SAMPLE
+dframe.sample()
+    randomly samples one row from dframe
+
+GET SAME AS BEFORE W RANDOM SEED
+np.random.seed(N)
+    N arbitrary number
+
+SAMPLE WITHOUT REPLACEMENT
+df.sample(2)
+SAMPLE WITH REPLACE
+df.sample(2, replace=True)
+
+INDEPENDENT events happen when the outcome of 1st doesnt affect outcome of 2nd
 
 
+############# DISCRETE DISTRIBUTIONS    
+prob dist = desciriont of prob of each outcome
+Expected Value = the mean of a prob dist
+    find by mult each value by its prob, sum, mean of that
+    so for six sided dice, expect val + 3.5
+
+BAR PLOT vizualizes prob distr.
 
 
 
