@@ -28,6 +28,60 @@ Skewed or asymmetric, use median
 
 Left-Skewed data - the TAIL is on the LEFT.  ditto R
 
+########## MEASURES OF SPREAD   
+VARIANCE
+    sum of squares of each dt pts distance from mean, dvd by # dt pts - 1
+        units are squared remember
+np.var(dframe['colName'], ddof=1)
+    DEGREES OF FREEDOM make sure to use 1 here, else it uses a SAMPLE variance,
+        best for large pops, which .. not yet
+
+STD DEV
+    sqrt of the variance
+np.std(dframe['colName'], ddof=1)
+    units are NOT squared so they are more intuitive to understand
+
+MEAN ABSOLUTE DEVIATION
+    takes abs val of dist to mean, then takes the mean of that
+    penalizes each distance equally, while stdev penalizes larger ones more than small
+
+QUANTILES   break up data into some number of equal parts
+np.quantile(dframe['col'], 0.25)
+np.quantile(dframe['col'], [0, 0.25, 0.5, 0.75, 1])
+    returns X, ie. 0%, 25%, 50%... of values in dataset are less than X-returned value
+    50% quantile IS the median, ie half the values are lower than this value
+    BOX PLOTS use quartiles, four-divided
+
+QUANTILES w NP.LINSPACE
+    np.linspace(start, stop, num)
+        start number, stop number, number of intervals
+np.quantile(dframe['colName'], np.linspace(0,1,5) )
+    these would be quartiles, since theyre from 0 to 100% and 5 diff interval pt
+
+IQR interquartile range, ie height of a box plot, 
+    the numb of vals btwn 25th and 75th quantile,
+        can get from the diff of those, or 
+    from scipy.stats import iqr,
+iqr(dframe['colName'])
+
+OUTLIERS are dt pt v diff fr others. but HOW diff? one rule - 
+any dt pt < Q1 - 1.5x IQR, or > Q3 + 1.5x IQR
+can calc by hand yay!  
+
+.DESCRIBE method gfives us ltos of these incl quartiles
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

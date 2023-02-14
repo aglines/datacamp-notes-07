@@ -38,8 +38,12 @@ df.sort_values(["colToSortFirst", "colSortSecond"], ascending=[True,False])
 Subset just one column, all rows?
 df["colName"]
 
-Subset multiple columns, all rows?
+Subset all ROWS from MULTIPLE COLUMNS
 df[["colName1", "colName2"] ]
+
+Subset CERTAIN ROWS meeting CERTAIN CONDITIONS from MULTIPLE COLUMNS
+df[ (df["col1"] == "X") | (df["col2"] < 50) ]
+
 
 Subset ROWS using condition to get BOOLEAN SERIES
 df["colName"] > 50
@@ -54,6 +58,14 @@ df[ (df["people"] < 1000) & (df["region"] == "Pacific") ]
 
 Subset ROWS on a column CONDITION, gets all ROWS & COLS where the condition holds?
 df[df["colName"] > 50 ]
+
+Subset ROWS in COL A, whose COL B value is a CONDITION
+df['colB'] = "value"
+df.loc[df['colA'] > 40, 'colB'] = "value"
+
+# SUBSET MULTIPLE STUFF W LOC
+df.loc[ (df['Salary']>=100000) & (df['Age']< 40), ['Name','JOB'] ] 
+
 
 
 subset on different values of a single column?
