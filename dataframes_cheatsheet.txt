@@ -125,6 +125,7 @@ grouped summary stats
 
 do math on multiple subsets at once
 group by the color variable, select the weight col, & get the mean:
+
 dogs.groupby("color")["weight"].mean()
 
 instead of
