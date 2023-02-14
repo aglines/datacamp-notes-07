@@ -1,0 +1,387 @@
+
+DATAFRAMES notes
+
+---------------------------------------
+EXAMINE data: 
+
+df.head()
+    first few rows shows
+df.info()
+    shows all cols, non-null count of rows, and datatype
+df.shape
+    number rows and number cos
+df.describe()
+    gives some summary stats - count, mean, stddev, min, max..
+df.values
+    shows all the values in a 2D numpy array
+df.columns
+    column names
+df.index 
+    shows row numbers or names
+
+----------------------------------------------------------
+Sorting and subsetting
+
+sort values
+df.sort_values("columnName")
+    default is ascending
+
+change sorting order
+df.sort_values("colName", ascending=False)
+
+sort by multiple values
+df.sort_values(["colToSortFirst", "colSortSecond"])
+
+df sorting - diff directions
+df.sort_values(["colToSortFirst", "colSortSecond"], ascending=[True,False])
+
+Subset just one column, all rows?
+df["colName"]
+
+Subset multiple columns, all rows?
+df[["colName1", "colName2"] ]
+
+Subset ROWS using condition to get BOOLEAN SERIES
+df["colName"] > 50
+
+Subset ROWS on multiple conditions, get Boolean Series
+is_over50["size"] > 50
+is_MainStreet["addr"] == "MainStreet"
+df[is_over50 & is_MainStreet]
+
+Subset ROWS on mult conditions in one line
+df[ (df["people"] < 1000) & (df["region"] == "Pacific") ] 
+
+Subset ROWS on a column CONDITION, gets all ROWS & COLS where the condition holds?
+df[df["colName"] > 50 ]
+
+
+subset on different values of a single column?
+is_Red_or_Gray = df["color"].isin(["Red", "Gray"])
+df[is_Red_or_Gray]
+
+add new columns from existing
+df["sizeMeters"] = df["sizeCm"] / 100
+
+---------------------------------------------------------------
+#### CHAP 2 SUMMARY STATS
+
+df["height"].mean()
+min, max
+median, mode
+var (variance), std, sum
+
+** aggregate method - combine any you want into a function
+def pct30(column):
+    return column.quantile(0.3)
+dogs["height"].agg(pct30)
+
+agg method on multiple col
+.. (as above)
+dogs[["height", "weight"]].agg(pct30)
+
+multiple aggs too -- 
+def pct40(column):
+    return column.quantile(0.4)
+dogs[["height", "weight"]].agg([pct30, pct40])
+
+cumulative sum
+dogs["height"].cumsum()
+ditto - cummax(), cummin(), cumprod()
+they all return a df, not a number
+
+--------------------------------------------------------------
+counting
+
+drop duplicates inside a single column
+df.drop_duplicates(subset="colName")
+
+drop duplicate pairs/groups within multiple columns
+df.drop_duplicates(subset=["col1", "col2"])
+
+count appearances in a column, ie categorical variables
+uniques.df["col1"].value_counts()
+
+and sort them as counting
+uniques.df["col1"].value_counts(sort=True)
+here sort is descending apparently
+
+normalize to turn counts into the proportion of total
+uniques.df["col1"].value_counts(normalize=True)
+--------------------------------------------------------------
+grouped summary stats
+
+do math on multiple subsets at once
+group by the color variable, select the weight col, & get the mean:
+dogs.groupby("color")["weight"].mean()
+
+instead of
+    dogs[dogs["color"] == "red"]["weight"].mean()
+    dogs[dogs["color"] == "blue"]["weight"].mean()
+    ...
+
+
+use agg method with grouped
+dogs.groupby("color")["weight"].agg([mean, min, sum])
+
+
+
+group by multiple everything
+dogs.groupby(["color","breed"])["weight","age"].agg([max, min])
+
+
+--------------------------------------------------------------
+PIVOT TABLE grouped summary stats w pivot table instead of groupby
+
+    groupby was df.groupby("color")["breed"]
+
+pivot table: values is selected col, index is col to group by
+df.pivot_table(values="breed", index="color")
+
+Note : pivot table uses the MEAN value for e group
+
+use a diff summary stat? use "aggfunc" jfc
+df.pivot_table(values="breed", index="color", aggfunc=np.median)
+
+multi summ stats
+df.pivot_table(values="breed", index="color", aggfunc=[np.median, np.mean])
+
+PIVOT like groupby can use multi variables:
+    df.groupby(["color","breed"])["age"].mean()
+df.pivot_table(values="age", index="color", columns="breed")
+    here the 1st col chosen becomes "values", 2nd is "columns"
+
+fill in missing vals or NaNs 
+df.pivot_table(values="age", index="color", columns="breed", fill_value=0)
+
+margins=True :  
+last column & row has mean of all values, not counting NaNs ... but it's... a sum?
+df.pivot_table(values="age", index="color", columns="breed", fill_value=0, margins=True)
+
+---------------------------------------------------------------------------------------------
+######## CHAP 3 Slicing and Indexing DataFrames
+Dataframes have 3 parts - a numpy array for data, & 2 indexes for row and col labels
+
+review: 
+    df.columns gives an Index object of col names
+    df.index gives an Index object of row numbers
+
+move a col from body of df to the Index
+df.set_index("colName")
+note - index values are now left-aligned  not right-aligned
+
+move data back
+df.reset_index()
+
+drop the index entirely, reverting it to numbers
+df.reset_index(drop=True)
+    whatever col had been moved to Index, is now entirely gone
+
+indexes make subsetting easier .loc
+df.loc[["name1", "name2"]]
+
+    this is hard to do without index names
+df[df["name1"].isin(["Mod","Nod"])]
+
+- index values need not be unique
+
+multiple indexes OK - multilevel or hierarchical
+df.set_index(["name", "age"])
+the inside one is the 2nd one set
+data forms groups first for outer index then inner
+
+subset rows of outer index - pass a list to loc with just outer index
+df.loc[["addr", "phone"]]
+
+subset rows at inner index - pass a list of BOTH indexes to loc
+df.loc[[ ("addr", "local"), ("phone", "mobile")  ]]
+resulting rows must match both indexes - just matching one index wont be returned
+
+sort by index
+df.sort_index()
+    sorts all indexes from outer to inner in ascending
+
+sort by index multiple
+df.sort_index( level=["addr", "phone"], ascending=[True,False])
+
+downsides? stores data in 2 ways means 2 syntaxes
+------------------------------------------------------------------------------------------------
+SLICING 
+
+sort index before slicing!
+dfSorted = df.sort_index()
+
+set and sort index same time
+dfSorted = df.set_index(["animal","breed"]).sort_index()
+
+to slice rows at outer index - 
+dfSorted.loc["bird":"cat"]
+
+same technique wont work on inner index - 
+dfSorted.loc["parakeet":"Siamese"]
+    returns empty df but NO ERROR
+
+to slice rows at inner index - pass values as tuples
+dfSorted.loc[("bird","parakeet") : ("cat","Siamese")]
+
+slice dataframe columns with loc - keep all rows
+dfSorted.loc[:, "addr":"zip"]
+
+slice rows and cols at same time incl multi-index:
+dfSorted.loc[ ("country","city"):("population","subpop") , "name":"year" ]
+
+slicing by dates - you can use just the year insetad of the whole string
+
+iloc - does NOT include final value, 
+loc DOES include final value
+
+----------------------------------------------------------
+pivot table subsets and calculsations
+
+review
+df.pivot_table(values="height", index="color", columns="breed" ..)
+args:
+1st "values" or nothing,
+    values to select
+2nd "index"
+group by this, display in ROWS
+3rd "columns" group by this in COLUMNS
+default agg func is mean
+fill_value=0,
+margins=True . sums it
+
+---pivot tables are just dataframes wtih sorted indexes
+
+so loc + slicing is ideal
+dog_height_by_breed_and_color.loc["chow chow":"poodle"]
+    for reference, table looks like - 
+
+COLOR       Black   Brown   Tan
+BREED   
+ChowChow    0.5     4.4     NaN
+Labrador    6.4     2.2     3.2
+Poodle      2.3     NaN     0.4
+
+summary statistics methods have an argument "axis",
+    dog_height_by_breed_and_color.mean(axis="index")
+index is default, meaning - "do this calculation ACROSS rows"
+    here gives you a list of mean values for all COLORS, ie across the BREEDS which are rows:
+color
+Black   34.3
+Brown   13.5
+Tan     3.4
+........ 
+to calc a summary stat "ACROSS columns", i.e. for each row,  axis="columns"
+
+
+--------------------------------------------------------------------------
+CH 4 VIS DATA  Creating and Visualizing DataFrames
+
+Plot w dataframe - call the dataframe slice and then the plt type
+
+Histograms or bar plots can show reltnsshps btwn a categorical variable, and a numeric variable
+here, group by breed, select weight col, and take the mean, giving us the avg weight of e breed
+    avg_weight_by_breed.plot(kind="bar")
+    dogsdf["heights"].hist()
+
+Histogram MULT VARS at a TIME - 
+dogs[["height_cm", "weight_kg"]].hist()
+
+Line plots can show changes in numeric variables over time
+    dogö.plot(kind="line")
+
+can change angle of labels 
+    dog.plot(x="date", y0+"weighg",kind= "line", rot=45)
+
+
+scatterplots show reltans btwn 2 numeric variables
+
+
+
+Plots can be layered atop each other, on same graph,
+use plt.legend w a list of labels before plt.show(),
+this will show a color legend woo
+
+Also alpha is translucency
+
+dogpack[dogpack["sex"]=="F"]["height"].hist(alpha=0.7)
+dogpack[dogpack["sex"]=="M"]["height"].hist(alpha=0.7)
+plt.legend(["F","M"])
+plt.show()
+
+
+
+LOOP OVER DATAFRAME
+
+METHOD  "ITERROWS"
+    gives 2 things - label of row, and data in that row (as a series)
+for label, row in brics.iterrows():
+    print... etc
+bc each row is a series you can subselect from there too
+
+for lab, row in brics.iterrows() :
+    print(lab + ": " + row["capital"])
+    brics.loc[lab, "name_length"] = len(row["country"])
+
+this WORKS yes but youre creating a Series object on every iteration
+which doesnt scale for large datasets
+use instead, APPLY
+
+-----------------------------------------
+MISSING VALUES
+isna method
+
+dogs.isna()
+shows whole df, NaN are True bools, anything w a value is False
+
+dogs.isna().any()
+chain isna with any method
+get one bool for each column if theres any NaN in that col
+
+take sum of Bools to see exactly how many NaNs det finns
+dogs.isna().sum()
+colWeight_  2   
+    so theres 2 NaNs in col Weight or whatver
+
+use those counts to visualze missing data in a bar plot
+dogs.isna().sum().plot(kind="bar")
+
+so what to do?DROPNA removes ALL ROWS w missing data
+dogs.dropna()
+
+so fioll them instead
+dogs.fillna(0)
+
+
+-----------------------------------------------------
+CREATING DATAFRAMES
+how create
+ok dicts yea
+
+make from a list of dit, 
+make df fr a dict of lists
+
+listOfDicts = [
+    {"name": "abc", "age":0 },
+    {"name": "def", "age":4 },
+]
+new = pd.DataFrame(listOfDicts)
+
+dictOfLists = {
+    "name": ["abc","def"] ,
+    "age" : [0, 4]
+}
+----------------------------------------------------
+CSV READ AND WRITE TO
+
+read from
+pd.read_csv("filepath/name.csv")
+
+alreadyDoneDataframe.to_csv("newfile.csv")
+writes to that 
+
+Dictating Using Windows Automationautomatic software
+
+
+
+

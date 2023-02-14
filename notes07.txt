@@ -1,4 +1,33 @@
 notes taken both here and paper sheets
 
+Summary stats . a fact abt the data
+Descriptive, Inferential types of stats
+Data types - numeric - continuous, discrete
+    Categorical, ordinal or nominal
+
+Measures of Center - ways to describe a 'typical' value in a dt set
+MEAN
+    'average' - add all pts, divide by nubmer of pts
+np.mean(dframe['colName'])
+
+MEDIAN
+    50% of data is higher, 50% lower
+np.median(dframe['colName'])    
+
+MODE    most frequent value taht appears in data
+    often used for CATEGORICAL vars, theyre not numeric
+
+statistics.mode(dframe['colName'])
+
+How know which to use? check OUTLIERS.
+dframe[dframe['colName'] == "specificType"]['valueOfInterest'].agg([np.mean, npmedian])
+with an outlier,
+Mean is sensitive to extreme values, Median not as much
+Symmetric data = use mean
+Skewed or asymmetric, use median
+
+Left-Skewed data - the TAIL is on the LEFT.  ditto R
+
+
 
 
